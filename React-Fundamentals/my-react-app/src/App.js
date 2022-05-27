@@ -39,10 +39,22 @@ function App() {
       <input id="search" type="text" />
       <hr />
       <List list={list} />
-      <List list={list2} />
+      <List_Arrow list={list2} />
     </div>
   );
 }
+
+const List_Arrow = (props) =>
+  props.list.map((item) => (
+    <div key={item.objectID}>
+      <span>
+        <a href={item.url}>{item.title} </a>
+      </span>
+      <span>{item.author} </span>
+      <span>{item.num_comments} </span>
+      <span>{item.points} </span>
+    </div>
+  ));
 
 function List(props) {
   return props.list.map((item) => (
