@@ -2,6 +2,22 @@
 // import "./App.css";
 import React from "react";
 
+function useSemiPersistentState(key, initialState) {
+  let tempState;
+  if (localStorage.getItem(key) === null) {
+    tempState = initialState;
+  } else {
+    tempState = localStorage.getItem(key);
+  }
+  const [value, setValue] = React.useState(tempState);
+
+  React.useEffect(() => {
+    localStorage.setItem(key, value);
+  }, [value, key]);
+
+  return [value, setValue];
+}
+
 function App() {
   const stories = [
     {
@@ -22,7 +38,7 @@ function App() {
     },
   ];
 
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -41,23 +57,22 @@ function App() {
   );
 }
 
-function Search(props) {
+function Search({ search, onSearch }) {
   return (
     <div>
       <label htmlFor="search">Search: </label>
-      <input
-        id="search"
-        type="text"
-        value={props.search}
-        onChange={props.onSearch}
-      />
+      <input id="search" type="text" value={search} onChange={onSearch} />
     </div>
   );
 }
 
-function List(props) {
-  return props.list.map((item) => (
-    <div key={item.objectID}>
+function List({ list }) {
+  return list.map((item) => <Item key={item.objectID} item={item} />);
+}
+
+function Item({ item }) {
+  return (
+    <div>
       <span>
         <a href={item.url}>{item.title} </a>
       </span>
@@ -65,7 +80,7 @@ function List(props) {
       <span>{item.num_comments} </span>
       <span>{item.points} </span>
     </div>
-  ));
+  );
 }
 
 export default App;
