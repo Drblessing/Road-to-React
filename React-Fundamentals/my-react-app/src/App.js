@@ -55,18 +55,12 @@ function App() {
         value={searchTerm}
         onInputChange={handleSearch}
       >
-        <strong>
-          <SimpleTextComponent string="Search:" />
-        </strong>
+        <strong>Search:</strong>
       </InputWithLabel>
       <hr />
       <List list={searchedStories} />
     </div>
   );
-}
-
-function SimpleTextComponent({ string }) {
-  return string;
 }
 
 function InputWithLabel({ id, value, type = "text", onInputChange, children }) {
