@@ -52,20 +52,21 @@ function App() {
       <h1>My Hacker Stories</h1>
       <InputWithLabel
         id="search"
-        label="Search"
         value={searchTerm}
         onInputChange={handleSearch}
-      />
+      >
+        <strong>Search:</strong>
+      </InputWithLabel>
       <hr />
       <List list={searchedStories} />
     </div>
   );
 }
 
-function InputWithLabel({ id, label, value, type = "text", onInputChange }) {
+function InputWithLabel({ id, value, type = "text", onInputChange, children }) {
   return (
     <>
-      <label htmlFor={id}>{label}</label>
+      <label htmlFor={id}>{children}</label>
       &nbsp;
       <input id={id} type={type} value={value} onChange={onInputChange} />
     </>
