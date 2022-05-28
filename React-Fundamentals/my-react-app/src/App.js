@@ -21,6 +21,19 @@ const initialStories = [
   },
 ];
 
+function storiesReducer(state, action) {
+  switch (action.type) {
+    case "SET_STORIES":
+      return action.payload;
+    case "REMOVE_STORY":
+      return state.filter(
+        (story) => action.payload.objectID !== story.objectID
+      );
+    default:
+      throw new Error();
+  }
+}
+
 function getAsyncStories() {
   return new Promise((resolve) =>
     setTimeout(() => resolve({ data: { stories: initialStories } }), 1000)
@@ -46,11 +59,22 @@ function useSemiPersistentState(key, initialState) {
 function App() {
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
 
-  const [stories, setStories] = useState([]);
+  const [stories, dispatchStories] = React.useReducer(storiesReducer, []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   React.useEffect(() => {
-    getAsyncStories().then((result) => {
-      setStories(result.data.stories);
-    });
+    setIsLoading(true);
+
+    getAsyncStories()
+      .then((result) => {
+        dispatchStories({
+          type: "SET_STORIES",
+          payload: result.data.stories,
+        });
+
+        setIsLoading(false);
+      })
+      .catch(() => setIsError(true));
   }, []);
 
   const handleSearch = (event) => {
@@ -58,10 +82,7 @@ function App() {
   };
 
   const handleRemoveStory = (item) => {
-    const newStories = stories.filter(
-      (story) => item.objectID !== story.objectID
-    );
-    setStories(newStories);
+    dispatchStories({ type: "REMOVE_STORY", payload: item });
   };
 
   const searchedStories = stories.filter((story) =>
@@ -79,7 +100,13 @@ function App() {
         <strong>Search:</strong>
       </InputWithLabel>
       <hr />
-      <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+      {isError && <p> Something went wrong ... </p>}
+
+      {isLoading ? (
+        <p> Loading ... </p>
+      ) : (
+        <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+      )}
     </div>
   );
 }
