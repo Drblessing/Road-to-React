@@ -62,15 +62,6 @@ function App() {
   );
 }
 
-function Search({ search, onSearch }) {
-  return (
-    <>
-      <label htmlFor="search">Search: </label>
-      <input id="search" type="text" value={search} onChange={onSearch} />
-    </>
-  );
-}
-
 function InputWithLabel({ id, label, value, type = "text", onInputChange }) {
   return (
     <>
