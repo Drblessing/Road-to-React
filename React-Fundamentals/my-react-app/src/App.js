@@ -21,6 +21,12 @@ const initialStories = [
   },
 ];
 
+function getAsyncStories() {
+  return new Promise((resolve) =>
+    setTimeout(() => resolve({ data: { stories: initialStories } }), 1000)
+  );
+}
+
 function useSemiPersistentState(key, initialState) {
   let tempState;
   if (localStorage.getItem(key) === null) {
@@ -40,7 +46,12 @@ function useSemiPersistentState(key, initialState) {
 function App() {
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
 
-  const [stories, setStories] = useState(initialStories);
+  const [stories, setStories] = useState([]);
+  React.useEffect(() => {
+    getAsyncStories().then((result) => {
+      setStories(result.data.stories);
+    });
+  }, []);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
