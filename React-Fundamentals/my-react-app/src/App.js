@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import styles from "./App.module.css";
-// import logo from "./logo.svg";
+import { ReactComponent as Check } from "./check.svg";
+import logo from "./logo.svg";
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
@@ -23,7 +24,7 @@ function storiesReducer(state, action) {
         ...state,
         data: state.data.filter(
           (story) => action.payload.objectID !== story.objectID
-        ),
+        ), 
       };
     default:
       throw new Error();
@@ -40,6 +41,7 @@ function useSemiPersistentState(key, initialState) {
   const [value, setValue] = React.useState(tempState);
 
   React.useEffect(() => {
+    console.log("A");
     localStorage.setItem(key, value);
   }, [value, key]);
 
@@ -189,7 +191,7 @@ function Item({ item, onRemoveItem }) {
           onClick={() => onRemoveItem(item)}
           className={`${styles.button} ${styles.buttonSmall}`}
         >
-          Dismiss
+          <Check height="18px" width="18px" />
         </button>
       </span>
     </div>
