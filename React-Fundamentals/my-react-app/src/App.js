@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./App.css";
+import styles from "./App.module.css";
 // import logo from "./logo.svg";
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
@@ -89,8 +89,8 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <h1 className="headline-primary">My Hacker Stories</h1>
+    <div className={styles.container}>
+      <h1 className={styles.headlinePrimary}>My Hacker Stories</h1>
       <SearchForm
         searchTerm={searchTerm}
         onSearchInput={handleSearchInput}
@@ -115,7 +115,7 @@ const SearchForm = ({
   onSearchSubmit,
   buttonClass,
 }) => (
-  <form onSubmit={onSearchSubmit} className="search-form">
+  <form onSubmit={onSearchSubmit} className={styles.searchForm}>
     <InputWithLabel
       id="search"
       value={searchTerm}
@@ -125,7 +125,11 @@ const SearchForm = ({
       <strong>Search:</strong>
     </InputWithLabel>
 
-    <button type="submit" disabled={!searchTerm} className={buttonClass}>
+    <button
+      type="submit"
+      disabled={!searchTerm}
+      className={`${styles.button} ${styles.buttonSmall}`}
+    >
       Submit
     </button>
   </form>
@@ -147,7 +151,7 @@ function InputWithLabel({
   }, [isFocused]);
   return (
     <>
-      <label htmlFor={id} className="label">
+      <label htmlFor={id} className={styles.label}>
         {children}
       </label>
       &nbsp;
@@ -158,7 +162,7 @@ function InputWithLabel({
         value={value}
         autoFocus={isFocused}
         onChange={onInputChange}
-        className="input"
+        className={styles.input}
       />
     </>
   );
@@ -172,7 +176,7 @@ function List({ list, onRemoveItem }) {
 
 function Item({ item, onRemoveItem }) {
   return (
-    <div className="item">
+    <div className={styles.item}>
       <span style={{ width: "40%" }}>
         <a href={item.url}>{item.title} </a>
       </span>
@@ -180,7 +184,11 @@ function Item({ item, onRemoveItem }) {
       <span style={{ width: "10%" }}>{item.num_comments} </span>
       <span style={{ width: "10%" }}>{item.points} </span>
       <span style={{ width: "10%" }}>
-        <button type="button" onClick={() => onRemoveItem(item)}>
+        <button
+          type="button"
+          onClick={() => onRemoveItem(item)}
+          className={`${styles.button} ${styles.buttonSmall}`}
+        >
           Dismiss
         </button>
       </span>
