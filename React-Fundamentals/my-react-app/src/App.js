@@ -4,8 +4,10 @@ import styles from "./App.module.css";
 // import logo from "./logo.svg";
 import List from "./List";
 import SearchForm from "./SearchForm";
+import { uniq } from "lodash";
 
-const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
+const API_ENDPOINT =
+  "https://hn.algolia.com/api/v1/search?hitsPerPage=100&query=";
 
 function storiesReducer(state, action) {
   switch (action.type) {
@@ -27,8 +29,6 @@ function storiesReducer(state, action) {
           (story) => action.payload.objectID !== story.objectID
         ),
       };
-    case "SET_STORIES":
-      return { ...state, data: action.payload };
     default:
       throw new Error();
   }
@@ -49,18 +49,23 @@ const useSemiPersistentState = (key, initialState) => {
 const getUrl = (searchTerm) => `${API_ENDPOINT}${searchTerm}`;
 
 const extractSearchTerm = (url) => url.replace(API_ENDPOINT, "");
-const getLastSearches = (urls) =>
-  urls.slice(-5).map((url) => extractSearchTerm(url));
 
 function App() {
+  const [page, setPage] = useState(1);
+  const [extraStories, setExtraStories] = useState([]);
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
-  const [urls, setUrls] = React.useState([getUrl(searchTerm)]);
+  const [urls, setUrls] = useState([getUrl(searchTerm)]);
 
   const [stories, dispatchStories] = React.useReducer(storiesReducer, {
     data: [],
     isLoading: false,
     isError: false,
   });
+  const getLastSearches = (urls) =>
+    uniq(urls)
+      .filter((url) => url.replace(API_ENDPOINT, "") !== searchTerm)
+      .slice(-5)
+      .map((url) => extractSearchTerm(url));
 
   const lastSearches = getLastSearches(urls);
 
@@ -71,6 +76,7 @@ function App() {
 
   const handleLastSearch = (searchTerm) => {
     handleSearch(searchTerm);
+    setSearchTerm(searchTerm);
   };
 
   const handleSearch = (searchTerm) => {
@@ -88,7 +94,7 @@ function App() {
     try {
       const lastUrl = urls[urls.length - 1];
       const result = await axios.get(lastUrl);
-
+      setPage(1);
       dispatchStories({
         type: "STORIES_FETCH_SUCCESS",
         payload: result.data.hits,
@@ -132,6 +138,9 @@ function App() {
       ) : (
         <List list={stories.data} onRemoveItem={handleRemoveStory} />
       )}
+      <button type="button" onClick={() => {}}>
+        More Results
+      </button>
     </div>
   );
 }
