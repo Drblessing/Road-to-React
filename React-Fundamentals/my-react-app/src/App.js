@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import styles from "./App.module.css";
-import { ReactComponent as Check } from "./check.svg";
-// import logo from "./logo.svg";
+import logo from "./logo.svg";
+import List from "./List";
+import SearchForm from "./SearchForm";
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
@@ -31,7 +32,7 @@ function storiesReducer(state, action) {
   }
 }
 
-const useSemiPersistentState = () => {
+const useSemiPersistentState = (key, initialState) => {
   const [value, setValue] = React.useState(
     localStorage.getItem(key) || initialState
   );
@@ -84,7 +85,6 @@ function App() {
   const handleRemoveStory = (item) => {
     dispatchStories({ type: "REMOVE_STORY", payload: item });
   };
-  console.log("B:App");
 
   return (
     <div className={styles.container}>
@@ -107,92 +107,6 @@ function App() {
   );
 }
 
-const SearchForm = ({
-  searchTerm,
-  onSearchInput,
-  onSearchSubmit,
-  buttonClass,
-}) => (
-  <form onSubmit={onSearchSubmit} className={styles.searchForm}>
-    <InputWithLabel
-      id="search"
-      value={searchTerm}
-      isFocused
-      onInputChange={onSearchInput}
-    >
-      <strong>Search:</strong>
-    </InputWithLabel>
-
-    <button
-      type="submit"
-      disabled={!searchTerm}
-      className={`${styles.button} ${styles.buttonSmall}`}
-    >
-      Submit
-    </button>
-  </form>
-);
-function InputWithLabel({
-  id,
-  value,
-  type = "text",
-  onInputChange,
-  isFocused,
-  children,
-}) {
-  const inputRef = React.useRef();
-
-  React.useEffect(() => {
-    if (isFocused && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isFocused]);
-  return (
-    <>
-      <label htmlFor={id} className={styles.label}>
-        {children}
-      </label>
-      &nbsp;
-      <input
-        ref={inputRef}
-        id={id}
-        type={type}
-        value={value}
-        autoFocus={isFocused}
-        onChange={onInputChange}
-        className={styles.input}
-      />
-    </>
-  );
-}
-
-function List({ list, onRemoveItem }) {
-  console.log("B:List");
-  return list.map((item) => (
-    <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
-  ));
-}
-
-function Item({ item, onRemoveItem }) {
-  return (
-    <div className={styles.item}>
-      <span style={{ width: "40%" }}>
-        <a href={item.url}>{item.title} </a>
-      </span>
-      <span style={{ width: "30%" }}>{item.author} </span>
-      <span style={{ width: "10%" }}>{item.num_comments} </span>
-      <span style={{ width: "10%" }}>{item.points} </span>
-      <span style={{ width: "10%" }}>
-        <button
-          type="button"
-          onClick={() => onRemoveItem(item)}
-          className={`${styles.button} ${styles.buttonSmall}`}
-        >
-          <Check height="18px" width="18px" />
-        </button>
-      </span>
-    </div>
-  );
-}
-
+// Prod and testing
 export default App;
+export { storiesReducer };
