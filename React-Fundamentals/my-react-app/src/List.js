@@ -79,8 +79,12 @@ function List({ list, onRemoveItem }) {
           </button>
         </span>
       </div>
-      {sortedList.map((item) => (
-        <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
+      {sortedList.map((item, index) => (
+        <Item
+          key={item.objectID + index}
+          item={item}
+          onRemoveItem={onRemoveItem}
+        />
       ))}
     </div>
   );

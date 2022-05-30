@@ -7,7 +7,7 @@ import SearchForm from "./SearchForm";
 import { uniq } from "lodash";
 
 const API_ENDPOINT =
-  "https://hn.algolia.com/api/v1/search?hitsPerPage=100&query=";
+  "https://hn.algolia.com/api/v1/search?hitsPerPage=20&query=";
 
 function storiesReducer(state, action) {
   switch (action.type) {
@@ -28,6 +28,11 @@ function storiesReducer(state, action) {
         data: state.data.filter(
           (story) => action.payload.objectID !== story.objectID
         ),
+      };
+    case "EXTEND_STORIES":
+      return {
+        ...state,
+        data: [...state.data, ...action.payload],
       };
     default:
       throw new Error();
@@ -52,7 +57,6 @@ const extractSearchTerm = (url) => url.replace(API_ENDPOINT, "");
 
 function App() {
   const [page, setPage] = useState(1);
-  const [extraStories, setExtraStories] = useState([]);
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
   const [urls, setUrls] = useState([getUrl(searchTerm)]);
 
@@ -94,7 +98,6 @@ function App() {
     try {
       const lastUrl = urls[urls.length - 1];
       const result = await axios.get(lastUrl);
-      setPage(1);
       dispatchStories({
         type: "STORIES_FETCH_SUCCESS",
         payload: result.data.hits,
@@ -110,6 +113,17 @@ function App() {
 
   const handleRemoveStory = (item) => {
     dispatchStories({ type: "REMOVE_STORY", payload: item });
+  };
+
+  const handleExtendStories = async () => {
+    const result = await axios.get(
+      `https://hn.algolia.com/api/v1/search?hitsPerPage=20&query=${extractSearchTerm(
+        urls[0]
+      )}&page=${page}`
+    );
+    setPage(page + 1);
+    console.log(result.data.hits);
+    dispatchStories({ type: "EXTEND_STORIES", payload: result.data.hits });
   };
 
   return (
@@ -138,7 +152,12 @@ function App() {
       ) : (
         <List list={stories.data} onRemoveItem={handleRemoveStory} />
       )}
-      <button type="button" onClick={() => {}}>
+      <button
+        type="button"
+        onClick={() => {
+          handleExtendStories();
+        }}
+      >
         More Results
       </button>
     </div>
