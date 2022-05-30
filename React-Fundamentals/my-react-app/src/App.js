@@ -4,20 +4,6 @@ import styles from "./App.module.css";
 import { ReactComponent as Check } from "./check.svg";
 // import logo from "./logo.svg";
 
-type Story = {
-  objectID: string;
-  url: string;
-  title: string;
-  author: string;
-  num_comments: number;
-  points: number;
-};
-
-type ItemProps = {
-  item: Story;
-  onRemoveItem: (item: Story) => void;
-};
-
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
 function storiesReducer(state, action) {
@@ -45,12 +31,7 @@ function storiesReducer(state, action) {
   }
 }
 
-const useSemiPersistentState = (
-  key: string,
-  initialState: string
-
-): [string, (newValue: string) => void] => {
-
+const useSemiPersistentState = () => {
   const [value, setValue] = React.useState(
     localStorage.getItem(key) || initialState
   );
