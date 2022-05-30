@@ -1,20 +1,24 @@
 import React from "react";
 import styles from "./App.module.css";
-import { sortBy } from "lodash";
+import { orderBy } from "lodash";
 
-const SORTS = {
-  NONE: (list) => list,
-  TITLE: (list) => sortBy(list, "title"),
-  AUTHOR: (list) => sortBy(list, "author"),
-  COMMENT: (list) => sortBy(list, "num_comments").reverse(),
-  POINT: (list) => sortBy(list, "points").reverse(),
-};
+function List({ list, onRemoveItem }) {
+  const SORTS = {
+    NONE: (list) => list,
+    TITLE: (list) => orderBy(list, "title", toggle ? "asc" : "desc"),
+    AUTHOR: (list) => orderBy(list, "author", toggle ? "asc" : "desc"),
+    COMMENT: (list) => orderBy(list, "num_comments", toggle ? "asc" : "desc"),
+    POINT: (list) => orderBy(list, "points", toggle ? "asc" : "desc"),
+  };
 
-function List({ list, onRemoveItem, setList }) {
-  // const [toggle, setToggle] = React.useState(false);
+  const [toggle, setToggle] = React.useState(false);
   const [sort, setSort] = React.useState("NONE");
+  const [activeSort, setActiveSort] = React.useState(null);
   const handleSort = (sortKey) => {
+    if (sort === sortKey) setToggle(!toggle);
+    else setToggle(false);
     setSort(sortKey);
+    setActiveSort(sortKey);
   };
   const sortFunction = SORTS[sort];
   const sortedList = sortFunction(list);
@@ -26,44 +30,52 @@ function List({ list, onRemoveItem, setList }) {
           <button
             type="button"
             onClick={() => {
-              handleSort("title");
+              handleSort("TITLE");
             }}
-            className={`${styles.button} ${styles.buttonSmall}`}
+            className={`${styles.button} ${styles.buttonSmall} ${
+              activeSort === "TITLE" ? styles.activeSort : ""
+            }`}
           >
-            Title
+            Title {activeSort === "TITLE" ? (toggle ? "▼" : "▲") : ""}
           </button>
         </span>
         <span style={{ width: "30%" }}>
           <button
             type="button"
             onClick={() => {
-              handleSort("author");
+              handleSort("AUTHOR");
             }}
-            className={`${styles.button} ${styles.buttonSmall}`}
+            className={`${styles.button} ${styles.buttonSmall} ${
+              activeSort === "AUTHOR" ? styles.activeSort : ""
+            }`}
           >
-            Author
+            Author {activeSort === "AUTHOR" ? (toggle ? "▼" : "▲") : ""}
           </button>
         </span>
         <span style={{ width: "10%" }}>
           <button
             type="button"
             onClick={() => {
-              handleSort("num_comments");
+              handleSort("COMMENT");
             }}
-            className={`${styles.button} ${styles.buttonSmall}`}
+            className={`${styles.button} ${styles.buttonSmall} ${
+              activeSort === "COMMENT" ? styles.activeSort : ""
+            }`}
           >
-            Num Comments
+            Num Comments {activeSort === "COMMENT" ? (toggle ? "▼" : "▲") : ""}
           </button>
         </span>
         <span style={{ width: "10%" }}>
           <button
             type="button"
             onClick={() => {
-              handleSort("points");
+              handleSort("POINT");
             }}
-            className={`${styles.button} ${styles.buttonSmall}`}
+            className={`${styles.button} ${styles.buttonSmall} ${
+              activeSort === "POINT" ? styles.activeSort : ""
+            }`}
           >
-            Points
+            Points {activeSort === "POINT" ? (toggle ? "▼" : "▲") : ""}
           </button>
         </span>
       </div>

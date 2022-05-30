@@ -74,3 +74,9 @@
 
   font-size: 24px;
 }
+
+.activeSort {
+  color: #ffffff;
+  font-weight: bold;
+  background-color: #000000;
+}

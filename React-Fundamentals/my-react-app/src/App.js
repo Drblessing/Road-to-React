@@ -46,10 +46,15 @@ const useSemiPersistentState = (key, initialState) => {
   return [value, setValue];
 };
 
+const getUrl = (searchTerm) => `${API_ENDPOINT}${searchTerm}`;
+
+const extractSearchTerm = (url) => url.replace(API_ENDPOINT, "");
+const getLastSearches = (urls) =>
+  urls.slice(-5).map((url) => extractSearchTerm(url));
+
 function App() {
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
-
-  const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
+  const [urls, setUrls] = React.useState([getUrl(searchTerm)]);
 
   const [stories, dispatchStories] = React.useReducer(storiesReducer, {
     data: [],
@@ -57,19 +62,32 @@ function App() {
     isError: false,
   });
 
+  const lastSearches = getLastSearches(urls);
+
+  const handleSearchSubmit = (event) => {
+    handleSearch(searchTerm);
+    event.preventDefault();
+  };
+
+  const handleLastSearch = (searchTerm) => {
+    handleSearch(searchTerm);
+  };
+
+  const handleSearch = (searchTerm) => {
+    const url = getUrl(searchTerm);
+    setUrls(urls.concat(url));
+  };
+
   const handleSearchInput = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSearchSubmit = (event) => {
-    setUrl(`${API_ENDPOINT}${searchTerm}`);
-    event.preventDefault();
-  };
   const handleFetchStories = React.useCallback(async () => {
     dispatchStories({ type: "STORIES_FETCH_INIT" });
 
     try {
-      const result = await axios.get(url);
+      const lastUrl = urls[urls.length - 1];
+      const result = await axios.get(lastUrl);
 
       dispatchStories({
         type: "STORIES_FETCH_SUCCESS",
@@ -78,7 +96,7 @@ function App() {
     } catch {
       dispatchStories({ type: "STORIES_FETCH_FAILURE" });
     }
-  }, [url]);
+  }, [urls]);
 
   React.useEffect(() => {
     handleFetchStories();
@@ -98,16 +116,21 @@ function App() {
         buttonClass="button button_small"
       />
 
+      {lastSearches.map((searchTerm, index) => (
+        <button
+          key={searchTerm + index}
+          type="button"
+          onClick={() => handleLastSearch(searchTerm)}
+        >
+          {searchTerm}
+        </button>
+      ))}
       {stories.isError && <p> Something went wrong ... </p>}
 
       {stories.isLoading ? (
         <p> Loading ... </p>
       ) : (
-        <List
-          list={stories.data}
-          setList={dispatchStories}
-          onRemoveItem={handleRemoveStory}
-        />
+        <List list={stories.data} onRemoveItem={handleRemoveStory} />
       )}
     </div>
   );
