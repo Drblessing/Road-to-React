@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import styles from "./App.module.css";
-import logo from "./logo.svg";
+// import logo from "./logo.svg";
 import List from "./List";
 import SearchForm from "./SearchForm";
 
@@ -27,6 +27,8 @@ function storiesReducer(state, action) {
           (story) => action.payload.objectID !== story.objectID
         ),
       };
+    case "SET_STORIES":
+      return { ...state, data: action.payload };
     default:
       throw new Error();
   }
@@ -101,7 +103,11 @@ function App() {
       {stories.isLoading ? (
         <p> Loading ... </p>
       ) : (
-        <List list={stories.data} onRemoveItem={handleRemoveStory} />
+        <List
+          list={stories.data}
+          setList={dispatchStories}
+          onRemoveItem={handleRemoveStory}
+        />
       )}
     </div>
   );
