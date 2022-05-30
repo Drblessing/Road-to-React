@@ -2,7 +2,21 @@ import React, { useState } from "react";
 import axios from "axios";
 import styles from "./App.module.css";
 import { ReactComponent as Check } from "./check.svg";
-import logo from "./logo.svg";
+// import logo from "./logo.svg";
+
+type Story = {
+  objectID: string;
+  url: string;
+  title: string;
+  author: string;
+  num_comments: number;
+  points: number;
+};
+
+type ItemProps = {
+  item: Story;
+  onRemoveItem: (item: Story) => void;
+};
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
@@ -24,29 +38,29 @@ function storiesReducer(state, action) {
         ...state,
         data: state.data.filter(
           (story) => action.payload.objectID !== story.objectID
-        ), 
+        ),
       };
     default:
       throw new Error();
   }
 }
 
-function useSemiPersistentState(key, initialState) {
-  let tempState;
-  if (localStorage.getItem(key) === null) {
-    tempState = initialState;
-  } else {
-    tempState = localStorage.getItem(key);
-  }
-  const [value, setValue] = React.useState(tempState);
+const useSemiPersistentState = (
+  key: string,
+  initialState: string
+
+): [string, (newValue: string) => void] => {
+
+  const [value, setValue] = React.useState(
+    localStorage.getItem(key) || initialState
+  );
 
   React.useEffect(() => {
-    console.log("A");
     localStorage.setItem(key, value);
   }, [value, key]);
 
   return [value, setValue];
-}
+};
 
 function App() {
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
@@ -89,6 +103,7 @@ function App() {
   const handleRemoveStory = (item) => {
     dispatchStories({ type: "REMOVE_STORY", payload: item });
   };
+  console.log("B:App");
 
   return (
     <div className={styles.container}>
@@ -171,6 +186,7 @@ function InputWithLabel({
 }
 
 function List({ list, onRemoveItem }) {
+  console.log("B:List");
   return list.map((item) => (
     <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
   ));
